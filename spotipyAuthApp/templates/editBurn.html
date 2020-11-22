@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+
+<body style='background-color: #1e2124; max-width: 1540px;'>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="margin-left: 70px;" class="navbar-brand  text-danger" href="#">MixTape</a>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link  text-danger offset-5" href="{% url 'Start' %}">Home<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger offset-10" href="#">Explore</a>
+                </li>
+            </ul>
+            <span>
+                <a class="nav-link active text-danger" href="{% url 'Logout' %}">Log Out</a>
+            </span>
+        </div>
+    </nav>
+    <div style= 'padding: 50px;'>
+        <h2 class='text-white'>Would you like to change anything?</h2>
+        <form id='burn_form' class= 'text-white'>
+            {% csrf_token %}
+            <div class="form-group row">
+                <label for="name" class="col-sm-2 col-form-label">Title</label>
+                <div class="col-sm-10">
+                    <input type="input" class="form-control" id="name" name = 'name' value='{{tape.name}}'>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="description" class="col-sm-2 col-form-label">Description</label>
+                <div class="col-sm-10">
+                    <textarea name="desc" id="description" class="form-control" cols="30"
+                        rows="10">{{tape.desc}}</textarea>
+                </div>
+            </div>
+            <fieldset class="form-group">
+                <div class="row">
+                    <legend class="col-form-label col-sm-2 pt-0">Status</legend>
+                    <div class="col-sm-10">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="public" value="public"
+                                checked>
+                            <label class="form-check-label" for="public">
+                                Public
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="private" value="private">
+                            <label class="form-check-label" for="private">
+                                Private
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="button" id='burn' class="btn btn-danger">BURN</button>
+                </div>
+            </div>
+            <input type="hidden" name = 'tape_id' value = '{{tape.id}}'>
+        </form>
+    </div>
+
+    <script>
+        $('#burn').click(function (e) {
+            console.log('hello')
+            e.preventDefault()
+            $.ajax({
+                url: "/burntape/",
+                method: 'post',
+                data: $('#burn_form').serialize(),
+                success: function (response) {
+                    alert(response)
+                }
+
+            })
+        })
+    </script>
+</body>
+
+
+
+</html>

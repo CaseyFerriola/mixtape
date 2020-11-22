@@ -1,0 +1,23 @@
+#main{
+    padding: 50px;
+
+}
+    img{
+        width: 150px;
+        height: 150px;
+    }
+    .icon_holder{
+        text-align: center;
+    }
+    .plus{
+        width:30px;
+        height: 30px;   
+    }
+    .minus{
+        width:30px;
+        height: 30px;   
+    }
+    .play{
+        width:30px;
+        height: 30px;   
+    }

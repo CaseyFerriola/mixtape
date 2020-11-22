@@ -1,0 +1,28 @@
+#shared{
+    display: flex;
+    justify-content: center;
+    margin: 0px 50px;
+    border-bottom: 2px solid #5d6368;
+}
+    #share_empty{
+        margin: 70px;
+        
+    }
+#bottom{
+
+}
+
+
+    #shelf{
+        display: flex;
+        
+
+    }
+        .box{
+
+        }
+
+        img{
+            width: 150px;
+            height: 150px;
+        }

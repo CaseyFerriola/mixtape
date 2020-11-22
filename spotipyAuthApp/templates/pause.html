@@ -1,0 +1,7 @@
+<form class='play_form' action="{% url 'RemoveSong'}" method="POST">
+    {% csrf_token %}
+    <img src="https://icons.iconarchive.com/icons/graphicloads/colorful-long-shadow/256/Button-2-pause-icon.png"
+    class="icon play" alt="https://personalenrichmentservices.com.au/wp-content/uploads/2017/10/Play-Button.png">
+    <input type="hidden" name="uri" value="{{song.uri}}">
+    <input type="hidden" name="tape_id" value="{{tape.spotify_id}}">
+</form>

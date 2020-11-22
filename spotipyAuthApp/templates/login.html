@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+
+<body style='background-color: #1e2124;'>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="margin-left: 70px;" class="navbar-brand  text-danger" href="#">MixTape</a>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link  text-danger offset-5" href="#">Home<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger offset-10" href="#">Explore</a>
+                </li>
+            </ul>
+            <span>
+                <a class="nav-link active text-danger" href='#'>Log Out</a>
+            </span>
+        </div>
+    </nav>
+    <div class='container'>
+        <div class="row">
+            {% if spot_status == False %}
+            <div id="login" class='text-success mt-3' >
+                <h1 style="font-size: 50px">Please log in to your <span>Spotify</span></h1>
+                <a href="/login/">Log in</a>
+            </div>
+            {% else %}
+            <div id="loggedin">
+                <h1 class= 'text-white mt-3'>Welcome, {{user.display_name}}</h1>
+                <a href="{% url 'NotYou' %}">Not you?</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col">
+                <form action="{% url 'Register' %}" method='POST' class="text-white mt-3" ">
+                    {% csrf_token %}
+                    {% if messages %}
+                    <ul class='messages'>
+                        {% for message in messages %}
+                        {% if message.extra_tags == 'Register' %}
+                        <li class='message.tags'>{{message}}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    <h2 style=" padding-bottom: 20px;">Register</h2>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type='email' class="form-control" id="email" required name='email'
+                                placeholder="Email...">
+                        </div>
+                        <div class="form-group">
+                            <label for="aka">Just Tell Me What You Want To Be Called</label>
+                            <input type='text' class="form-control" id="aka" name='aka' placeholder="Optional...">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" name='password' class="form-control" id="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password_confirmation">Password Confirmation</label>
+                            <input type="password" name='password2' class="form-control" id="password_confirmation"
+                                required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class='col mt-3'>
+                <form action="{% url 'LoginUser' %}" method='POST' class="text-white">
+                    {% if messages %}
+                    <ul class='messages'>
+                        {% for message in messages %}
+                        {% if message.extra_tags == 'Login' %}
+                        <li class='message.tags'>{{message}}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    <h2 class='text-white' style="padding-bottom: 20px;">Login</h2>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type='email' class="form-control" id="email" required name='email'>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name='password' class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+
+</html>

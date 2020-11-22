@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/mixtapeInfo.css' %}">
+</head>
+
+<body style='background-color: #1e2124;'>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="margin-left: 70px;" class="navbar-brand  text-danger" href="#">MixTape</a>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link  text-danger offset-5" href="{% url 'Start' %}">Home<span
+                            class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger offset-10" href="#">Explore</a>
+                </li>
+            </ul>
+            <span>
+                <a class="nav-link active text-danger" href='{% url "Logout" %}'>Log Out</a>
+            </span>
+        </div>
+    </nav>
+    <div id="main">
+        <div class="container bg-dark p-3">
+            <h1 class='text-white row justify-content-md-center'>{{tape.name}} </h1>
+            <div class="row align-items-end">
+                <div class="col-3 d-flex align-items-end">
+                    <form action="{% url 'ShareTape' %}" method = 'POST' id = 'share'>
+                        {% csrf_token %}
+                        <select name="share_with" id="share" placeholer= 'Choose who to share with...'>
+                            <option value="all">The Whole World</option>
+                            {% for user in users %}
+                            <option value="{{user.id}}">{{user.aka}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" value = '{{tape.id}}' name = 'tape_id'>
+                        <button type= 'submit' id = 'burn' class='btn btn-success mt-3'>SHARE</button>
+                    </form>
+                    <a href="{% url 'ToEditBurn' tape.id %}" class='btn btn-danger'>BURN</a>
+                </div>
+                <div class="col-3 offset-2 align-self-center">
+                    <img src="{{tape.images}}" alt="">
+                </div>
+                <div class="col-4 ml-0">
+                    <form action="{% url 'SearchSong' %}" class='d-flex flex-column align-items-end' method='POST'>
+                        {% csrf_token %}
+                        <input id='target' type="text" placeholder="Search for song..." name='new_song'>
+                        <input type="hidden" name="tape_id" value="{{tape.spotify_id}}">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div id='tables' class="container p-3 bg-dark">
+            <table id='mixtape_songs' class="table table-bordered table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Song</th>
+                        <th scope="col">Artist(s)</th>
+                        <th scope="col">Play/Pause</th>
+                        <th scope="col">Remove Song</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for song in songs %}
+                    <tr>
+                        <th scope="row">{{song.num}}</th>
+                        <td>{{song.name}}</td>
+                        <td>{% for artist in song.artists %}{{artist}} {% endfor %}</td>
+                        <td class='icon_holder'>
+                            <form class='play_form' action="{% url 'RemoveSong'}" method="POST">
+                                {% csrf_token %}
+                                <img src= 
+                                "https://personalenrichmentservices.com.au/wp-content/uploads/2017/10/Play-Button.png"
+                                alt="https://icons.iconarchive.com/icons/graphicloads/colorful-long-shadow/256/Button-2-pause-icon.png"
+                                class="icon play">
+                                <input type="hidden" name="uri" value="{{song.uri}}">
+                                <input type="hidden" name="tape_id" value="{{tape.spotify_id}}">
+                            </form>
+                        </td>
+                        <td class="icon_holder">
+                            <form class='m_form' action="{% url 'RemoveSong'}" method="POST">
+                                {% csrf_token %}
+                                <img src=" https://www.pngarts.com/files/3/Red-Minus-Symbol-PNG-Image-Background.png"
+                                alt="" class="minus icon">
+                                <input type="hidden" name="id" value="{{song.id}}">
+                                <input type="hidden" name="tape_id" value="{{tape.spotify_id}}">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+
+        //searches for songs and returns them in a table
+        $('form').keyup(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/searchsong/',
+                method: 'post',
+                data: $(this).serialize(),
+                success: function (response) {
+                    $('#tables').html(response)
+                }
+            })
+        })
+
+        //Enlarges/shrinks icon that is hovered over
+        $(".icon")
+            .mouseenter(function () {
+                $(this).css("width", "32px")
+                $(this).css("height", "32px")
+                $(this).parent('.icon_holder').css("padding", "6")
+            })
+            .mouseleave(function () {
+                $(this).css("width", "30px")
+                $(this).css("height", "30px")
+                $(this).parent('.icon_holder').css("padding", "12")
+            });
+
+
+        //Removes the song that was chosen from playlist and returns table
+        $('.minus').click(function (e) {
+            e.preventDefault()
+
+            // console.log($(this).parent('.p_form').serialize())
+            $.ajax({
+                url: "/removesong/",
+                method: 'post',
+                data: $(this).parent('.m_form').serialize(),
+                success: function (response) {
+                    $('#tables').html(response)
+                }
+
+            })
+        })
+
+        //Plays or pauses song and returns the playlist in a table
+        $('.play').click(function (e) {
+            e.preventDefault()
+            console.log($(this).attr('src'))
+            if ($(this).attr('src') == "https://personalenrichmentservices.com.au/wp-content/uploads/2017/10/Play-Button.png") {
+                console.log('hello')
+                $.ajax({
+                    url: "/playsong/",
+                    method: 'post',
+                    data: $(this).parent('.play_form').serialize(),
+                    success: function (response) {
+                        // var temp = $(this).attr('src')
+                        // $(this).attr("src", $(this).attr('alt'))
+                        // $(this).attr('alt', temp)
+                        console.log(response)
+                        $(this).parent().parent('.icon_holder').html(response)
+                    }
+
+                })
+            } else if ($(this).attr('src') == "https://icons.iconarchive.com/icons/graphicloads/colorful-long-shadow/256/Button-2-pause-icon.png") {
+                console.log('hello2')
+                $.ajax({
+
+                    url: "/pausesong/",
+                    method: 'post',
+                    data: $(this).parent('.play_form').serialize(),
+                    success: function (response) {
+                        // var temp = $(this).attr('src')
+                        // $(this).attr("src", $(this).attr('alt'))
+                        // $(this).attr('alt', temp)
+                        console.log(response)
+                        $(this).parent('.icon_holder').html(response)
+                    }
+
+                })
+            }
+
+        })
+        $('.play').click(function () {
+            var temp = $(this).attr('src')
+            $(this).attr("src", $(this).attr('alt'))
+            $(this).attr('alt', temp)
+        })
+
+    </script>
+</body>
+
+</html>

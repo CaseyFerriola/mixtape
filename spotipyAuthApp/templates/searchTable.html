@@ -1,0 +1,62 @@
+
+    <table id='search' class="table table-bordered table-dark table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Bubbles</th>
+                <th scope="col">Artist(s)</th>
+                <th scope="col">Add Song</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for search in searches %}
+            <tr>
+                <th scope="row">{{search.num}}</th>
+                <td>{{search.name}}</td>
+                <td>{{search.artist}}</td>
+
+                <td class='plus_holder'>
+                    <form class='p_form' action="{% url 'AddSong'}" method="POST">
+                        {% csrf_token %}
+                        <img class=" plus"
+                        src="https://www.loxone.com/enus/wp-content/uploads/sites/13/2016/12/IC_plus.png">
+                        <input type="hidden" name="id" value="{{search.id}}">
+                        <input type="hidden" name = "tape_id" value = "{{tape_id}}">
+                    </form>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+
+<script>
+    console.log($('.plus').attr('alt_source'))
+
+    $(".plus")
+        .mouseenter(function () {
+            $(this).css("width", "55px")
+            $(this).css("height", "55px")
+            $(this).parent('.plus_holder').css("padding", "10")
+        })
+        .mouseleave(function () {
+            $(this).css("width", "50px")
+            $(this).css("height", "50px")
+            $(this).parent('.plus_holder').css("padding", "12")
+        });
+    $('.plus').click(function (e) {
+        e.preventDefault()
+        $.ajax({
+            url: "/addsong/",
+            method: 'post',
+            data: $(this).parent('.p_form').serialize(),
+            success: function (response) {
+                $('#tables').html(response)
+            }
+
+        })
+    })
+</script>

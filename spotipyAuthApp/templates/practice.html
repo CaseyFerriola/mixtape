@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <img class = 'plus' src="https://www.loxone.com/enus/wp-content/uploads/sites/13/2016/12/IC_plus.png" alt="">
+
+
+    <script>
+
+        $(".plus")
+            .mouseenter(function () {
+                $(this).css("width", "30px");
+                $(this).css("length", "30px");
+            })
+            .mouseleave(function () {
+                $(this).css("width", "50px");
+                $(this).css("length", "50px");
+            });
+    </script>
+</body>
+
+</html>

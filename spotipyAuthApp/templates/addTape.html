@@ -1,0 +1,46 @@
+<div id="bottom">
+    <div id="bot-top" class='d-flex justify-content-between'>
+        <h3 class='m-3 text-danger'>Welcome, {{curr_user.aka}}</h3>
+        <form id = 'addtape' class="form-inline m-3 d-flex justify-content-end" method='POST' action="{% url 'AddTape' %}">
+            {% csrf_token %}
+            <div class="form-group mx-sm-3 mb-2">
+                <p class='text-white m-3'>Add MixTape:</p>
+                <select class="form-control" id="mixtape" name='mixtape' placeholder="Add">
+                    {% for playlist in playlists %}
+                    <option value="{{playlist.id}}">{{playlist.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2 bg-danger text-dark">Add Tape</button>
+        </form>
+    </div>
+    <h2 class='d-flex justify-content-center p-5 text-danger'>Your Shelf</h2>
+    <div id="shelf" class='d-flex flex-wrap'>
+        {% if tapes %}
+        {% for tape in tapes %}
+            <div style='max-width: 200px;' class='d-flex flex-column align-items-center flex-wrap mx-4'>
+                <a class='m-2 text-white' href="{% url 'TapeInfo' id=tape.id %}">{{tape.name}}</a>
+                <a href="{% url 'TapeInfo' id=tape.id %}"><img src="{{tape.images}}" alt=""></a>
+                <a class='m-2 text-white' href="{% url 'DeleteTape' id=tape.id %}">Delete</a>
+            </div>
+            {% endfor %}
+        {% else %}
+        <h2 class="text-danger">You have nothing on your shelf</h2>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+    $('#addtape').submit(function (e) {
+        e.preventDefault()
+        $.ajax({
+            url: "/addtape/",
+            method: 'post',
+            data: $(this).serialize(),
+            success: function (result) {
+                $("#bottom").html(result)
+            }
+        })
+    })
+</script>
