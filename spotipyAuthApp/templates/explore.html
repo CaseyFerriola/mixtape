@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+
+<body style='background-color: #1e2124; max-width: 1540px;'>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="margin-left: 70px;" class="navbar-brand  text-danger" href="#">MixTape</a>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link  text-danger offset-5" href="#">Home<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger offset-10" href="#">Explore</a>
+                </li>
+            </ul>
+            <span>
+                <a class="nav-link active text-danger" href="{% url 'Logout' %}">Log Out</a>
+            </span>
+        </div>
+    </nav>
+    <div class="container ml-0" style="background-color: #353a40;">
+        <div class="col-2 text-white p-3" style=" min-height: 700px;">
+            {% if users %}
+            <h4>Recommended Users</h4>
+            <ul>
+                {% for user in users %}
+                <li><a href="#">{{user.aka}}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

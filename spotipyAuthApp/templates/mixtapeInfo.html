@@ -31,19 +31,30 @@
     </nav>
     <div id="main">
         <div class="container bg-dark p-3">
-            <h1 class='text-white row justify-content-md-center'>{{tape.name}} </h1>
+            <h1 class='text-white row justify-content-md-center align-items-center'>{{tape.name}} </h1>
+            <div id="curr_song" class='d-flex'>
+                <form id = 'shuffle_form' action="#">
+                    {% csrf_token %}
+                    <input type="hidden" value = '{{tape.id}}' name = 'tape_id'>
+                    <a id='shuffle' href="#"><img class='toggle'
+                            style='width: 50px; height: 50px;'
+                            src="https://www.shareicon.net/data/256x256/2016/05/28/772235_arrows_512x512.png"
+                            alt="https://icons.iconarchive.com/icons/graphicloads/colorful-long-shadow/256/Button-2-pause-icon.png"></a>
+                </form>
+                <div id="curr_song_info" class = 'text-danger pl-3'></div>
+            </div>
             <div class="row align-items-end">
                 <div class="col-3 d-flex align-items-end">
-                    <form action="{% url 'ShareTape' %}" method = 'POST' id = 'share'>
+                    <form action="{% url 'ShareTape' %}" method='POST' id='share'>
                         {% csrf_token %}
-                        <select name="share_with" id="share" placeholer= 'Choose who to share with...'>
+                        <select name="share_with" id="share" placeholer='Choose who to share with...'>
                             <option value="all">The Whole World</option>
                             {% for user in users %}
                             <option value="{{user.id}}">{{user.aka}}</option>
                             {% endfor %}
                         </select>
-                        <input type="hidden" value = '{{tape.id}}' name = 'tape_id'>
-                        <button type= 'submit' id = 'burn' class='btn btn-success mt-3'>SHARE</button>
+                        <input type="hidden" value='{{tape.id}}' name='tape_id'>
+                        <button type='submit' id='burn' class='btn btn-success mt-3'>SHARE</button>
                     </form>
                     <a href="{% url 'ToEditBurn' tape.id %}" class='btn btn-danger'>BURN</a>
                 </div>
@@ -171,7 +182,6 @@
             } else if ($(this).attr('src') == "https://icons.iconarchive.com/icons/graphicloads/colorful-long-shadow/256/Button-2-pause-icon.png") {
                 console.log('hello2')
                 $.ajax({
-
                     url: "/pausesong/",
                     method: 'post',
                     data: $(this).parent('.play_form').serialize(),
@@ -193,6 +203,23 @@
             $(this).attr('alt', temp)
         })
 
+        //Shuffle
+        $('#shuffle').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: "/shuffle/", 
+                method: 'post',
+                data: $('#shuffle_form').serialize(),
+                success: function(response){
+                    $('#curr_song_info').html(response)
+                }
+            })
+        })
+        $('.toggle').click(function () {
+            var temp = $(this).attr('src')
+            $(this).attr("src", $(this).attr('alt'))
+            $(this).attr('alt', temp)
+        })
     </script>
 </body>
 

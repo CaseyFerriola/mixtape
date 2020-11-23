@@ -39,8 +39,7 @@ def login(request):
     else:
         context = {
             'spot_status': False
-        }
-        
+        } 
     return render(request, 'login.html', context)
     
 def login_user(request):
@@ -60,7 +59,7 @@ def get_cache_path(id):
 
 
 def get_spotify_object(request):
-    auth_manager = SpotifyOAuth(cache_path= get_cache_path(request.session['cache_id']))
+    auth_manager = SpotifyOAuth(client_id = client_id, client_secret = client_secret,redirect_uri= 'http://localhost:8000/login/', scope=scope, cache_path= get_cache_path(request.session['cache_id']))
     return spotipy.Spotify(auth_manager= auth_manager)
 
 
@@ -171,8 +170,18 @@ def tape_info(request, id):
     }
     return render(request, 'mixtapeInfo.html', context)
 def search_song(request):
+    sp = get_spotify_object(request)
     post = request.POST['new_song']
-    results = get_spotify_object(request).search(q= post, limit= 15)
+    if post == '':
+        tape_id = request.POST['tape_id']
+        mixtape = sp.playlist_tracks(playlist_id= tape_id)
+        s = list_of_track_objects(mixtape)
+        context = {
+            'songs': s,
+            'tape_id': request.POST['tape_id']
+        }
+        return render(request, 'mixtapeSongsTable.html', context)
+    results = sp.search(q= post, limit= 15)
     tracks = results['tracks']
     searches = []
     count = 0
@@ -276,19 +285,48 @@ def remove_song(request):
     }
     return render(request, 'mixtapeSongsTable.html', context)
 
+# def display_curr_song(request):
+
+def shuffle(request):
+    sp =  get_spotify_object(request)
+    tape = MixTape.objects.get(id = request.POST['tape_id'])
+    device = sp.devices()
+    mixtape = sp.playlist_tracks(playlist_id = tape.spotify_id)
+    sp.shuffle(True, device['devices'][0]['id'])
+    song_uris = []
+    for song in mixtape['items']:
+        uri = song['track']['uri']
+        song_uris.append(uri)
+    sp.start_playback(device_id = device['devices'][0]['id'], uris = song_uris)
+    playback = sp.current_playback()
+    context = {
+        'curr_song': {'name': playback['item']['name'], 'artist': playback['item']['artists'][0]['name']}
+    }
+    return render(request, 'shuffle.html', context)
+
 def play_song(request):
     print('hello')
     sp =  get_spotify_object(request)
     tape_id = request.POST['tape_id']
-    # mixtape = sp.playlist_tracks(playlist_id= tape_id)
-    # s = list_of_track_objects(mixtape)
+    song_uris = []
     song_uri = request.POST['uri']
+    print(song_uri)
+    mixtape = sp.playlist_tracks(playlist_id= tape_id)
+    count = 0
+    for song in mixtape['items']:
+        uri = song['track']['uri']
+        song_uris.append(uri)
+        print(song_uris)
+        if song_uri == uri:
+            song_index = count
+        count += 1
+    songs = song_uris[song_index:len(song_uris)]
+    print(songs)
     song = sp.track(song_uri)
-    # print(song)
+    # print()
     device = sp.devices()
-    print('*'*80)
-    print(device)
-    sp.start_playback(uris = [song_uri], device_id = device['devices'][0]['id'])
+    sp.shuffle(False, device['devices'][0]['id'])
+    sp.start_playback(device_id = device['devices'][0]['id'], uris = songs)
     context = {
         'song': song,
         'tape_id': tape_id
@@ -306,6 +344,14 @@ def pause_song(request):
     }
     # return render(request, 'mixtapeSongsTable.html', context)
     return render(request, 'play.html', context)
+def explore(request):
+    curr_user = User.objects.get(id = request.session['curr_user'])
+    users = User.objects.all().exclude(id = curr_user.id)
+    context = {
+        'users': users,
+        'curr_user': curr_user
+    }
+    return render(request, 'explore.html', context)
 def delete_tape(request, id):
     tape = MixTape.objects.get(id = id)
     tape.delete()
